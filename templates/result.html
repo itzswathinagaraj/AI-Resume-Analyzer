@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ResumeAI — Analysis Result</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --bg: #0a0a0f; --card: #16161f; --border: rgba(255,255,255,0.07); --text: #f0f0f8; --muted: #888899; }
+  html, body { min-height: 100vh; background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; }
+  body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 80% 60% at 15% 5%, rgba(124,109,250,0.1) 0%, transparent 55%), radial-gradient(ellipse 60% 50% at 85% 90%, rgba(250,109,143,0.07) 0%, transparent 55%); pointer-events: none; z-index: 0; }
+  body::after { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 60px 60px; pointer-events: none; z-index: 0; }
+  .wrapper { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 40px 20px 60px; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 48px; animation: fadeDown 0.5s ease both; }
+  .logo { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 800; background: linear-gradient(135deg, #7c6dfa, #fa6d8f); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .back-btn { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--muted); font-size: 0.87rem; border: 1px solid var(--border); padding: 8px 16px; border-radius: 100px; transition: all 0.2s; }
+  .back-btn:hover { color: var(--text); border-color: rgba(124,109,250,0.4); background: rgba(124,109,250,0.07); }
+  .page-title { font-family: 'Syne', sans-serif; font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800; margin-bottom: 8px; animation: fadeDown 0.6s 0.1s ease both; }
+  .page-subtitle { color: var(--muted); font-size: 0.95rem; margin-bottom: 40px; font-weight: 300; animation: fadeDown 0.6s 0.15s ease both; }
+  .score-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; animation: fadeUp 0.7s 0.2s ease both; }
+  @media (max-width: 560px) { .score-row { grid-template-columns: 1fr; } }
+  .score-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 28px; position: relative; overflow: hidden; }
+  .score-card::before { content: ''; position: absolute; top: -30px; right: -30px; width: 100px; height: 100px; border-radius: 50%; opacity: 0.08; }
+  .score-card.purple::before { background: #7c6dfa; }
+  .score-card.pink::before { background: #fa6d8f; }
+  .score-label { font-size: 0.75rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; }
+  .score-card.purple .score-label { color: #a89cfc; }
+  .score-card.pink .score-label { color: #fc9db4; }
+  .score-number { font-family: 'Syne', sans-serif; font-size: 3rem; font-weight: 800; line-height: 1; margin-bottom: 16px; }
+  .score-card.purple .score-number { color: #7c6dfa; }
+  .score-card.pink .score-number { color: #fa6d8f; }
+  .prog-track { width: 100%; height: 6px; background: rgba(255,255,255,0.07); border-radius: 100px; overflow: hidden; }
+  .prog-fill { height: 100%; border-radius: 100px; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
+  .score-card.purple .prog-fill { background: linear-gradient(90deg, #7c6dfa, #9c6dfa); }
+  .score-card.pink .prog-fill { background: linear-gradient(90deg, #fa6d8f, #fa9db4); }
+  .charts-row { display: grid; grid-template-columns: 200px 1fr; gap: 16px; margin-bottom: 24px; animation: fadeUp 0.7s 0.3s ease both; }
+  @media (max-width: 600px) { .charts-row { grid-template-columns: 1fr; } }
+  .chart-card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .chart-card h4 { font-family: 'Syne', sans-serif; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-bottom: 20px; align-self: flex-start; }
+  .donut-wrap { width: 150px; height: 150px; }
+  .skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; animation: fadeUp 0.7s 0.4s ease both; }
+  @media (max-width: 560px) { .skills-grid { grid-template-columns: 1fr; } }
+  .skill-section { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 24px; }
+  .skill-section h4 { font-family: 'Syne', sans-serif; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 16px; }
+  .skill-section.found h4 { color: #7cfa9d; }
+  .skill-section.missing h4 { color: #fa9d7c; }
+  .skill-tag { display: inline-flex; align-items: center; gap: 6px; border-radius: 8px; padding: 7px 12px; font-size: 0.83rem; font-weight: 500; margin: 4px 4px 4px 0; }
+  .skill-tag.found { background: rgba(124,250,157,0.1); border: 1px solid rgba(124,250,157,0.2); color: #7cfa9d; }
+  .skill-tag.missing { background: rgba(250,157,124,0.1); border: 1px solid rgba(250,157,124,0.2); color: #fa9d7c; }
+  .bar-chart-wrap { width: 100%; }
+  .bar-item { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 0.83rem; }
+  .bar-item-label { width: 100px; flex-shrink: 0; color: var(--muted); text-transform: capitalize; }
+  .bar-item-track { flex: 1; height: 8px; background: rgba(255,255,255,0.06); border-radius: 100px; overflow: hidden; }
+  .bar-item-fill { height: 100%; border-radius: 100px; background: linear-gradient(90deg, #7c6dfa, #9c6dfa); transition: width 1s ease; }
+  .bar-item-fill.missing-bar { background: linear-gradient(90deg, #fa6d8f, #fa9db4); }
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="topbar">
+    <div class="logo">ResumeAI</div>
+    <a href="/" class="back-btn">← Analyze Another</a>
+  </div>
+  <h1 class="page-title">Your Analysis Results</h1>
+  <p class="page-subtitle">Here's what we found in your resume. Review your strengths and recommended improvements below.</p>
+  <div class="score-row">
+    <div class="score-card purple">
+      <div class="score-label">Resume Score</div>
+      <div class="score-number">{{ score }}<small style="font-size:1.2rem">%</small></div>
+      <div class="prog-track"><div class="prog-fill" id="resumeBar" style="width: 0%"></div></div>
+    </div>
+    <div class="score-card pink">
+      <div class="score-label">ATS Match Score</div>
+      <div class="score-number">{{ ats }}<small style="font-size:1.2rem">%</small></div>
+      <div class="prog-track"><div class="prog-fill" id="atsBar" style="width: 0%"></div></div>
+    </div>
+  </div>
+  <div class="charts-row">
+    <div class="chart-card">
+      <h4>Overall Score</h4>
+      <div class="donut-wrap"><canvas id="donutChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <h4>Skill Breakdown</h4>
+      <div class="bar-chart-wrap" id="barChartWrap"></div>
+    </div>
+  </div>
+  <div class="skills-grid">
+    <div class="skill-section found">
+      <h4>✓ Skills Detected</h4>
+      {% if skills %}
+        {% for skill in skills %}<span class="skill-tag found">✓ {{ skill }}</span>{% endfor %}
+      {% else %}
+        <p style="color: var(--muted); font-size: 0.85rem;">No matching skills found.</p>
+      {% endif %}
+    </div>
+    <div class="skill-section missing">
+      <h4>⚠ Recommended Skills</h4>
+      {% if missing %}
+        {% for skill in missing %}<span class="skill-tag missing">+ {{ skill }}</span>{% endfor %}
+      {% else %}
+        <p style="color: #7cfa9d; font-size: 0.85rem;">Great! All key skills detected.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+<script>
+  const resumeScore = {{ score }};
+  const atsScore = {{ ats }};
+  setTimeout(() => {
+    document.getElementById('resumeBar').style.width = resumeScore + '%';
+    document.getElementById('atsBar').style.width = atsScore + '%';
+  }, 200);
+  const ctx = document.getElementById('donutChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Score', 'Remaining'],
+      datasets: [{ data: [resumeScore, 100 - resumeScore], backgroundColor: ['#7c6dfa', 'rgba(255,255,255,0.05)'], borderWidth: 0 }]
+    },
+    options: {
+      cutout: '72%',
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      animation: { duration: 1200, easing: 'easeInOutQuart' }
+    },
+    plugins: [{
+      id: 'centerText',
+      beforeDraw(chart) {
+        const { ctx, chartArea: { left, right, top, bottom } } = chart;
+        const cx = (left + right) / 2, cy = (top + bottom) / 2;
+        ctx.save();
+        ctx.font = 'bold 22px Syne, sans-serif';
+        ctx.fillStyle = '#f0f0f8';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(resumeScore + '%', cx, cy);
+        ctx.restore();
+      }
+    }]
+  });
+  const allSkills = {{ skills | tojson }};
+  const missingSkills = {{ missing | tojson }};
+  const barWrap = document.getElementById('barChartWrap');
+  allSkills.forEach(skill => {
+    barWrap.innerHTML += `<div class="bar-item"><div class="bar-item-label">${skill}</div><div class="bar-item-track"><div class="bar-item-fill" style="width:0%" data-w="100"></div></div></div>`;
+  });
+  missingSkills.slice(0, 4).forEach(skill => {
+    barWrap.innerHTML += `<div class="bar-item"><div class="bar-item-label" style="color:#fa9d7c">${skill}</div><div class="bar-item-track"><div class="bar-item-fill missing-bar" style="width:0%" data-w="30"></div></div></div>`;
+  });
+  setTimeout(() => {
+    document.querySelectorAll('.bar-item-fill[data-w]').forEach(el => { el.style.width = el.dataset.w + '%'; });
+  }, 300);
+</script>
+</body>
+</html>

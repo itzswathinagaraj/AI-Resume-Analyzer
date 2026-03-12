@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ResumeAI — Smart Resume Analyzer</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0a0a0f; --surface: #111118; --card: #16161f;
+    --border: rgba(255,255,255,0.07); --accent: #7c6dfa;
+    --accent2: #fa6d8f; --text: #f0f0f8; --muted: #888899;
+  }
+  html, body { min-height: 100vh; background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; overflow-x: hidden; }
+  body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 80% 60% at 20% 10%, rgba(124,109,250,0.12) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 80% 80%, rgba(250,109,143,0.08) 0%, transparent 60%); pointer-events: none; z-index: 0; }
+  body::after { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px); background-size: 60px 60px; pointer-events: none; z-index: 0; }
+  .wrapper { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; }
+  .badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(124,109,250,0.12); border: 1px solid rgba(124,109,250,0.3); border-radius: 100px; padding: 6px 16px; font-size: 12px; font-weight: 500; color: #a89cfc; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 28px; animation: fadeDown 0.6s ease both; }
+  .badge::before { content: ''; width: 7px; height: 7px; background: #7c6dfa; border-radius: 50%; box-shadow: 0 0 8px #7c6dfa; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.4); } }
+  h1 { font-family: 'Syne', sans-serif; font-size: clamp(2.4rem, 6vw, 4rem); font-weight: 800; line-height: 1.1; text-align: center; margin-bottom: 16px; animation: fadeDown 0.7s 0.1s ease both; }
+  h1 span { background: linear-gradient(135deg, #7c6dfa 0%, #fa6d8f 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .subtitle { color: var(--muted); font-size: 1.05rem; text-align: center; max-width: 480px; line-height: 1.6; margin-bottom: 48px; font-weight: 300; animation: fadeDown 0.7s 0.2s ease both; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 40px; width: 100%; max-width: 560px; position: relative; animation: fadeUp 0.8s 0.3s ease both; box-shadow: 0 0 80px rgba(124,109,250,0.08), 0 20px 60px rgba(0,0,0,0.4); }
+  .card::before { content: ''; position: absolute; inset: -1px; border-radius: 24px; background: linear-gradient(135deg, rgba(124,109,250,0.2), transparent 50%, rgba(250,109,143,0.1)); z-index: -1; pointer-events: none; }
+  .upload-zone { border: 2px dashed rgba(124,109,250,0.35); border-radius: 16px; padding: 40px 24px; text-align: center; cursor: pointer; transition: all 0.25s ease; position: relative; background: rgba(124,109,250,0.03); margin-bottom: 28px; }
+  .upload-zone:hover { border-color: rgba(124,109,250,0.7); background: rgba(124,109,250,0.07); transform: translateY(-2px); }
+  .upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .upload-icon { width: 52px; height: 52px; background: linear-gradient(135deg, rgba(124,109,250,0.2), rgba(250,109,143,0.1)); border-radius: 14px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 24px; }
+  .upload-zone h3 { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+  .upload-zone p { font-size: 0.83rem; color: var(--muted); }
+  .file-name { font-size: 0.8rem; color: #a89cfc; margin-top: 10px; display: none; }
+  .field-label { font-size: 0.8rem; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; display: block; }
+  textarea { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 12px; padding: 16px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; line-height: 1.6; resize: vertical; min-height: 130px; transition: border-color 0.2s; margin-bottom: 28px; }
+  textarea:focus { outline: none; border-color: rgba(124,109,250,0.5); background: rgba(124,109,250,0.04); }
+  textarea::placeholder { color: #555566; }
+  button[type="submit"] { width: 100%; padding: 16px; background: linear-gradient(135deg, #7c6dfa, #9c6dfa); border: none; border-radius: 12px; color: white; font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.25s ease; position: relative; overflow: hidden; letter-spacing: 0.02em; }
+  button[type="submit"]:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(124,109,250,0.45); }
+  button[type="submit"]:active { transform: translateY(0); }
+  .features { display: flex; gap: 10px; margin-top: 32px; flex-wrap: wrap; justify-content: center; animation: fadeUp 0.8s 0.5s ease both; }
+  .feat { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 100px; padding: 6px 14px; font-size: 0.78rem; color: var(--muted); }
+  .feat-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="badge">AI-Powered Analysis</div>
+  <h1>Analyze Your Resume<br>with <span>Intelligence</span></h1>
+  <p class="subtitle">Upload your resume and paste a job description. Get instant skill insights, ATS match score, and recommendations.</p>
+  <div class="card">
+    <form action="/upload" method="post" enctype="multipart/form-data" id="mainForm">
+      <label class="field-label">Resume (PDF)</label>
+      <div class="upload-zone" id="uploadZone">
+        <input type="file" name="resume" accept=".pdf" required id="fileInput">
+        <div class="upload-icon">📄</div>
+        <h3>Drop your PDF here</h3>
+        <p>or click to browse files</p>
+        <div class="file-name" id="fileName"></div>
+      </div>
+      <label class="field-label">Job Description</label>
+      <textarea name="jobdesc" placeholder="Paste the job description here — we'll match it against your resume to calculate your ATS score..."></textarea>
+      <button type="submit">Analyze Resume →</button>
+    </form>
+  </div>
+  <div class="features">
+    <div class="feat"><div class="feat-dot" style="background:#7c6dfa"></div>Skill Detection</div>
+    <div class="feat"><div class="feat-dot" style="background:#fa6d8f"></div>ATS Matching</div>
+    <div class="feat"><div class="feat-dot" style="background:#6dfabd"></div>Resume Score</div>
+    <div class="feat"><div class="feat-dot" style="background:#fad06d"></div>Missing Skills</div>
+  </div>
+</div>
+<script>
+  document.getElementById('fileInput').addEventListener('change', function() {
+    const name = this.files[0]?.name;
+    const el = document.getElementById('fileName');
+    const icon = document.querySelector('.upload-icon');
+    if (name) { el.textContent = '✓ ' + name; el.style.display = 'block'; icon.textContent = '✅'; }
+  });
+</script>
+</body>
+</html>
