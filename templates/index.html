@@ -32,6 +32,9 @@
   .upload-zone p { font-size: 0.83rem; color: var(--muted); }
   .file-name { font-size: 0.8rem; color: #a89cfc; margin-top: 10px; display: none; }
   .field-label { font-size: 0.8rem; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 10px; display: block; }
+  select { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; margin-bottom: 24px; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888899' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; transition: border-color 0.2s; }
+  select:focus { outline: none; border-color: rgba(124,109,250,0.5); }
+  select option { background: #16161f; color: var(--text); }
   textarea { width: 100%; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 12px; padding: 16px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; line-height: 1.6; resize: vertical; min-height: 130px; transition: border-color 0.2s; margin-bottom: 28px; }
   textarea:focus { outline: none; border-color: rgba(124,109,250,0.5); background: rgba(124,109,250,0.04); }
   textarea::placeholder { color: #555566; }
@@ -49,9 +52,10 @@
 <div class="wrapper">
   <div class="badge">AI-Powered Analysis</div>
   <h1>Analyze Your Resume<br>with <span>Intelligence</span></h1>
-  <p class="subtitle">Upload your resume and paste a job description. Get instant skill insights, ATS match score, and recommendations.</p>
+  <p class="subtitle">Upload your resume, select a job role, and paste a job description for instant AI-powered insights.</p>
   <div class="card">
     <form action="/upload" method="post" enctype="multipart/form-data" id="mainForm">
+
       <label class="field-label">Resume (PDF)</label>
       <div class="upload-zone" id="uploadZone">
         <input type="file" name="resume" accept=".pdf" required id="fileInput">
@@ -60,16 +64,25 @@
         <p>or click to browse files</p>
         <div class="file-name" id="fileName"></div>
       </div>
-      <label class="field-label">Job Description</label>
-      <textarea name="jobdesc" placeholder="Paste the job description here — we'll match it against your resume to calculate your ATS score..."></textarea>
+
+      <label class="field-label">Select Job Role</label>
+      <select name="role">
+        {% for role in roles %}
+        <option value="{{ role }}">{{ role }}</option>
+        {% endfor %}
+      </select>
+
+      <label class="field-label">Job Description (Optional)</label>
+      <textarea name="jobdesc" placeholder="Paste the job description here for ATS match score..."></textarea>
+
       <button type="submit">Analyze Resume →</button>
     </form>
   </div>
   <div class="features">
-    <div class="feat"><div class="feat-dot" style="background:#7c6dfa"></div>Skill Detection</div>
+    <div class="feat"><div class="feat-dot" style="background:#7c6dfa"></div>Role Matching</div>
     <div class="feat"><div class="feat-dot" style="background:#fa6d8f"></div>ATS Matching</div>
-    <div class="feat"><div class="feat-dot" style="background:#6dfabd"></div>Resume Score</div>
-    <div class="feat"><div class="feat-dot" style="background:#fad06d"></div>Missing Skills</div>
+    <div class="feat"><div class="feat-dot" style="background:#6dfabd"></div>Strength Meter</div>
+    <div class="feat"><div class="feat-dot" style="background:#fad06d"></div>Course Recommendations</div>
   </div>
 </div>
 <script>
