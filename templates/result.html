@@ -1,31 +1,144 @@
-<!-- AI Analysis -->
-{% if ai.summary %}
-<div class="tips-card" style="border-color: rgba(124,109,250,0.3); margin-bottom:24px;">
-  <h4 style="color:#a89cfc">🤖 AI Resume Analysis</h4>
-  <p style="color:var(--muted); font-size:0.9rem; margin-bottom:16px;">{{ ai.summary }}</p>
+<!DOCTYPE html>
 
-  {% if ai.strengths %}
-  <h5 style="color:#7cfa9d; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.07em; margin-bottom:10px;">✓ Strengths</h5>
-  {% for s in ai.strengths %}
-  <div class="tip-item" style="color:#7cfa9d">{{ s }}</div>
-  {% endfor %}
-  {% endif %}
+<html>
+<head>
+<title>Resume Analysis Result</title>
+<style>
+body{
+font-family: Arial;
+background:#0f0f1a;
+color:white;
+padding:40px;
+}
 
-  {% if ai.improvements %}
-  <h5 style="color:#fad06d; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.07em; margin:16px 0 10px;">⚠ Improvements</h5>
-  {% for i in ai.improvements %}
-  <div class="tip-item">{{ i }}</div>
-  {% endfor %}
-  {% endif %}
+.card{
+background:#1b1b2b;
+padding:20px;
+border-radius:10px;
+margin-bottom:20px;
+}
+
+h2{
+color:#a89cfc;
+}
+
+ul{
+margin-top:10px;
+}
+
+.score{
+font-size:22px;
+font-weight:bold;
+}
+
+.good{color:#7cfa9d;}
+.bad{color:#fa6d8f;}
+.warn{color:#fad06d;}
+
+.tip{
+background:#26263b;
+padding:8px;
+margin:6px 0;
+border-radius:6px;
+} </style>
+
+</head>
+
+<body>
+
+<h1>Resume Analysis Result</h1>
+
+<div class="card">
+<h2>Selected Role</h2>
+<p>{{ role }}</p>
+</div>
+
+<div class="card">
+<h2>Skill Match Score</h2>
+<p class="score">{{ score }}%</p>
+<p>{{ strength }}</p>
+</div>
+
+<div class="card">
+<h2>ATS Match Score</h2>
+<p class="score">{{ ats }}%</p>
+</div>
+
+<div class="card">
+<h2>Detected Skills</h2>
+<ul>
+{% for s in skills %}
+<li class="good">{{ s }}</li>
+{% endfor %}
+</ul>
+</div>
+
+<div class="card">
+<h2>Missing Skills</h2>
+<ul>
+{% for m in missing %}
+<li class="bad">{{ m }}</li>
+{% endfor %}
+</ul>
+</div>
+
+<div class="card">
+<h2>Resume Improvement Tips</h2>
+{% for t in tips %}
+<div class="tip">{{ t }}</div>
+{% endfor %}
+</div>
+
+<div class="card">
+<h2>Recommended Courses</h2>
+<ul>
+{% for c in courses %}
+<li>{{ c }}</li>
+{% endfor %}
+</ul>
+</div>
+
+{% if ai and ai.summary %}
+
+<div class="card">
+<h2>AI Resume Analysis</h2>
+
+<p>{{ ai.summary }}</p>
+
+{% if ai.strengths %}
+
+<h3>Strengths</h3>
+<ul>
+{% for s in ai.strengths %}
+<li class="good">{{ s }}</li>
+{% endfor %}
+</ul>
+{% endif %}
+
+{% if ai.improvements %}
+
+<h3>Improvements</h3>
+<ul>
+{% for i in ai.improvements %}
+<li class="warn">{{ i }}</li>
+{% endfor %}
+</ul>
+{% endif %}
+
 </div>
 {% endif %}
 
-<!-- Cover Letter -->
-{% if ai.cover_letter %}
-<div class="tips-card" style="border-color: rgba(250,109,143,0.3); margin-bottom:24px;">
-  <h4 style="color:#fc9db4">✍ AI Generated Cover Letter</h4>
-  <p style="color:var(--muted); font-size:0.88rem; line-height:1.8; white-space:pre-line;">{{ ai.cover_letter }}</p>
+{% if ai and ai.cover_letter %}
+
+<div class="card">
+<h2>AI Generated Cover Letter</h2>
+<p style="white-space:pre-line;">{{ ai.cover_letter }}</p>
 </div>
 {% endif %}
 
+<br>
 
+<a href="/" style="color:#a89cfc">Analyze Another Resume</a>
+
+</body>
+</html>
