@@ -23,9 +23,10 @@
 
 ## 🖥️ Demo
 
-| Upload Page | Results Dashboard |
-|---|---|
-| Upload PDF + paste job description | Skill analysis, ATS score, charts |
+![Home](https://raw.githubusercontent.com/itzswathinagaraj/AI-Resume-Analyzer/main/static/demo1.png)
+![Results](https://raw.githubusercontent.com/itzswathinagaraj/AI-Resume-Analyzer/main/static/demo2.png)
+![Skills](https://raw.githubusercontent.com/itzswathinagaraj/AI-Resume-Analyzer/main/static/demo3.png)
+![Tips](https://raw.githubusercontent.com/itzswathinagaraj/AI-Resume-Analyzer/main/static/demo4.png)
 
 ---
 
